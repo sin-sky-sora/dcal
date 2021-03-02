@@ -6,7 +6,6 @@
 git clone https://github.com/sin-sky-sora/dcal.git
 # pyenv
 cd dcal
-chmod 777 init.sh
 sh init.sh
 source ~/.bash_profile
 pyenv install 3.8.8
@@ -18,4 +17,10 @@ pipenv install
 pipenv run python manage.py runserver
 # or
 pipenv run start
+```
+
+### github push
+```
+git config --global user.email "email@example.com"
+git config --global user.name "name"
 ```
