@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+{% endblock css %}
+
+{% block maincontent %}
+    <div id='calendar'></div>
+{% endblock maincontent %}
+
+{% block js %}
+    <script type="text/javascript">
+        const cal = document.getElementById("calendar")
+        document.addEventListener("DOMContentLoaded",function(){
+            const calendar = new FullCalendar.Calendar(cal,{
+                headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+              },
+              locale: "ja",
+              navLinks: true,
+              businessHours: true,
+              editable: false,
+              selectable: false,
+              eventLimit: true,
+              weekNumbers: false,
+              events: [
+                {
+                    title: "経験値2倍",
+                    start: "2021-03-02",
+                    end: "2021-03-02"
+                },{
+                    title: "イベント",
+                    start: "2021-03-03T20:30:00",
+                    end: "2021-03-03T22:30:00"
+                }],
+                events: "{% url 'get_event' %}"
+            })
+            calendar.render();
+        })
+    </script>
+{% endblock js %}
