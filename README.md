@@ -2,8 +2,13 @@
 
 ### start project from paiza.cloud
 ```
+# project install
+git clone https://github.com/sin-sky-sora/dcal.git
 # pyenv
-curl https://pyenv.run | bash
+cd dcal
+chmod 777 init.sh
+sh init.sh
+source ~/.bash_profile
 pyenv install 3.8.8
 pyenv global 3.8.8
 # pipenv
