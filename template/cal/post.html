@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block maincontent %}
+    <h1>{{ context.foo }}</h1>
+    <form method="POST" action="{% url 'saves' %}">{% csrf_token %}
+        <input type="text" name="title" placeholder="Title">
+        <input type="text" name="startDay_0" placeholder="yyyy-mm--dd">
+        <input type="text" name="startDay_1" placeholder="hh:mm:ss">
+        <input type="submit" value="submit">
+    </form>
+{% endblock maincontent %}
