@@ -24,14 +24,27 @@
     <h1>{{ context.foo }}</h1>
     <form method="POST" action="{% url 'saves' %}">{% csrf_token %}
         <input type="text" name="title" placeholder="タイトル" required>
+        <div class="forms">
+            <label>
+                <input type="radio" name="types" data-label="times">
+                <span>時間</span>
+            </label><label>
+                <input type="radio" name="types" data-label="allday">
+                <span>終日</span>
+            </label>
+        </div>
         <div class="calendars">
             <div class="cal_container">
-                <p>開始日</p>
-                <input class="picker prev" name="startDay" required>
+                <p>日付</p>
+                <input class="picker day" name="thisDay" data-cal="false" data-time="false" data-format="Y-m-d" required>
             </div>
             <div class="cal_container">
-                <p>終了日</p>
-                <input class="picker next" name="endDay" required>
+                <p>開始時間</p>
+                <input class="picker prev" name="startTime" data-cal="true" data-time="true" data-format="H:i" required>
+            </div>
+            <div class="cal_container">
+                <p>終了時間</p>
+                <input class="picker next" name="endTime" data-cal="true" data-time="true" data-format="H:i" required>
             </div>
         </div>
         <input type="submit" value="submit" class="submitter" disabled="true">
@@ -40,21 +53,28 @@
 
 {% block js %}
     <script type="text/javascript">
-        flatpickr(".picker",{
-            locale: "ja",
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            inline: true,
-            time_24hr: true,
-            onChange: function(e){
-                const submitBtn = document.querySelector(".submitter")
-                const prev = document.querySelector(".prev").value
-                const next = document.querySelector(".next").value
-                if(next > prev && prev && next)
-                    submitBtn.disabled = false;
-                else if(!submitBtn.disabled)
-                    submitBtn.disabled = true
-            }
-        });
+        const toBool = (str) => str.toLowerCase() === "true"
+        function times(){
+            document.querySelectorAll(".picker").forEach(function(el){
+                flatpickr(el,{
+                    locale: "ja",
+                    enableTime: toBool(el.dataset.time),
+                    noCalendar: toBool(el.dataset.cal),
+                    dateFormat: el.dataset.format,
+                    inline: true,
+                    time_24hr: true,
+                    onChange: function(e){
+                        const submitBtn = document.querySelector(".submitter")
+                        const prev = document.querySelector(".prev").value
+                        const next = document.querySelector(".next").value
+                        if(next > prev && prev && next)
+                            submitBtn.disabled = false;
+                        else if(!submitBtn.disabled)
+                            submitBtn.disabled = true
+                    }
+                });
+            })
+        }
+        times()
     </script>
 {% endblock js %}
