@@ -14,22 +14,27 @@
         display: inline-block;
         text-align: center;
     }
+    .picker{
+        display: none;
+    }
 </style>
 {% endblock css %}
 
 {% block maincontent %}
     <h1>{{ context.foo }}</h1>
     <form method="POST" action="{% url 'saves' %}">{% csrf_token %}
-        <input type="text" name="title" placeholder="Title">
+        <input type="text" name="title" placeholder="タイトル" required>
         <div class="calendars">
             <div class="cal_container">
-                <input class="picker prev">
+                <p>開始日</p>
+                <input class="picker prev" name="startDay" required>
             </div>
             <div class="cal_container">
-                <input class="picker next">
+                <p>終了日</p>
+                <input class="picker next" name="endDay" required>
             </div>
         </div>
-        <input type="submit" value="submit">
+        <input type="submit" value="submit" class="submitter" disabled="true">
     </form>
 {% endblock maincontent %}
 
@@ -49,6 +54,7 @@
                     submitBtn.disabled = false;
                 else if(!submitBtn.disabled)
                     submitBtn.disabled = true
-  }
+            }
+        });
     </script>
 {% endblock js %}

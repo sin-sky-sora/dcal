@@ -6,6 +6,29 @@
 {% endblock css %}
 
 {% block maincontent %}
+    {% if context.type == "failed" %}
+        <div class="alert alert-danger m-3">
+            <p>失敗</p>
+            <p>
+                {% if context.error == "date" %}
+                    日付が正しくないよ
+                {% elif context.error == "title" %}
+                    タイトルが正しくないよ
+                {% elif context.error == "all" %}
+                    データが正しいか確認してね
+                {% elif context.error == "method" %}
+                    アクセス方法が正しくないよ
+                {% endif %}
+            </p>
+        </div>
+    {% elif context.type == "success" %}
+        <div class="alert alert-success">
+            ありがとう
+        </div>
+    {% endif %}
+    <div class="text-center">
+        <a href='{% url "post" %}' class="btn btn-primary">日程を登録する</a>
+    </div>
     <div id='calendar'></div>
 {% endblock maincontent %}
 
