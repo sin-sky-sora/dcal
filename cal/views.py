@@ -11,10 +11,54 @@ from datetime import datetime,timezone,timedelta
 
 # タイムゾーンの作成
 JST = timezone(timedelta(hours=9),"JST")
-
+DayTimeFormatStyle = "%Y-%m-%d %H:%M"
+DayOnlyFormatStyle = "%Y-%m-%d"
 def index(request):
-    return render(request,"cal/index.html",{"test":"text"})
-
+    if request.method == "GET":
+        return render(request,"cal/index.html")
+    elif request.method == "POST":
+        context = {"type":"failed"}
+        title = request.POST["title"]
+        days = request.POST["thisDay"]
+        startTime = request.POST["startTime"]
+        endTime = request.POST["endTime"]
+        alldays = request.POST["types"]
+        if title and days and endTime and startTime and alldays:
+            if alldays == "times":
+                all_day = False
+                start = days + " " +startTime
+                start_time = datetime.strptime(start,DayTimeFormatStyle).astimezone(JST)
+                end = days + " " + endTime
+                end_time = datetime.strptime(end,DayTimeFormatStyle).astimezone(JST)
+            elif alldays == "allday":
+                all_day = True
+                start = days + " 09:00"
+                start_time = datetime.strptime(start,DayTimeFormatStyle).astimezone(JST)
+                end = days + " 10:00"
+                end_time = datetime.strptime(end,DayTimeFormatStyle).astimezone(JST)
+            else:
+                context["error"] = "radio"
+                context["message"] = "incorrect for radio"
+                return render(request,"cal/index.html",{"context":context})
+            if(end_time > start_time):
+                context["type"] = "success"
+                model = TestModel()
+                model.title = title
+                model.startDay = start_time
+                model.endDay = end_time
+                model.allday = all_day
+                model.save()
+            else:
+                context["message"] = "incorrect for date"
+                context["error"] = "date"
+        else:
+            context["message"] = "Not enough information"
+            context["error"] = "lack"
+    else:
+        context["message"] = "incorrect for method"
+        context["error"] = "method"
+    return render(request,"cal/index.html",{"context":context})
+    
 def get_event(request):
     start = request.GET["start"]
     end = request.GET["end"]
@@ -31,8 +75,11 @@ def get_event(request):
         eve = {}
         eve["id"] = data.pk
         eve["title"] = data.title
-        eve["start"] = data.startDay
-        eve["end"] = data.endDay
+        if data.allday:
+            eve["start"] = data.startDay.strftime("%Y-%m-%d")
+        else:
+            eve["start"] = data.startDay.strftime("%Y-%m-%dT%H:%M")
+            eve["end"] = data.endDay.strftime("%Y-%m-%dT%H:%M")
         event.append(eve)
     return JsonResponse(event,safe=False)
 def event_regist(request):
@@ -40,34 +87,5 @@ def event_regist(request):
         "foo": "登録フォーム"
     }
     return render(request,"cal/post.html",{"context":context})
-    
-TimeFormatStyle = "%Y-%m-%d %H:%M"
-def event_set(request):
-    context = {"type":"failed"}
-    if request.method == "POST":
-        title = request.POST["title"]
-        start = request.POST["startDay"]
-        start_time = datetime.strptime(start,TimeFormatStyle).astimezone(JST)
-        end = request.POST["endDay"]
-        end_time = datetime.strptime(end,TimeFormatStyle).astimezone(JST)
 
-        if(title and end_time > start_time):
-            context["type"] = "success"
-            model = TestModel()
-            model.title = title
-            model.startDay = start_time
-            model.endDay = end_time
-            model.save()
-        elif title:
-            context["message"] = "incorrect for date"
-            context["error"] = "date"
-        elif end_time > start_time:
-            context["message"] = "incorrect for title"
-            context["error"] = "title"
-        else:
-            context["message"] = "incorrect for all"
-            context["error"] = "all"
-    else:
-        context["message"] = "incorrect for method"
-        context["error"] = "method"
-    return render(request,"cal/index.html",{"context":context})
+

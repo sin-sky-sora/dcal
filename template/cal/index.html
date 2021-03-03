@@ -12,12 +12,12 @@
             <p>
                 {% if context.error == "date" %}
                     日付が正しくないよ
-                {% elif context.error == "title" %}
-                    タイトルが正しくないよ
-                {% elif context.error == "all" %}
-                    データが正しいか確認してね
+                {% elif context.error == "lack" %}
+                    情報が足りません
                 {% elif context.error == "method" %}
                     アクセス方法が正しくないよ
+                {% elif context.error == "radio" %}
+                    入力項目が正しくありませんでした
                 {% endif %}
             </p>
         </div>

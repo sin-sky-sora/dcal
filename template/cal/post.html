@@ -13,6 +13,10 @@
     .cal_container{
         display: inline-block;
         text-align: center;
+        vertical-align: top;
+    }
+    .cal_times{
+        margin: 8px 0px;
     }
     .picker{
         display: none;
@@ -22,39 +26,41 @@
 
 {% block maincontent %}
     <h1>{{ context.foo }}</h1>
-    <form method="POST" action="{% url 'saves' %}">{% csrf_token %}
-        <input type="text" name="title" placeholder="タイトル" required>
+    <form method="POST" action="{% url 'index' %}" onsubmit="return test()">{% csrf_token %}
+        <input type="text" class="w-100 required" name="title" placeholder="タイトル" required>
         <div class="forms">
             <label>
-                <input type="radio" name="types" data-label="times">
+                <input type="radio" name="types" data-label="times" value="times" checked>
                 <span>時間</span>
             </label><label>
-                <input type="radio" name="types" data-label="allday">
+                <input type="radio" name="types" data-label="allday" value="allday">
                 <span>終日</span>
             </label>
         </div>
         <div class="calendars">
             <div class="cal_container">
                 <p>日付</p>
-                <input class="picker day" name="thisDay" data-cal="false" data-time="false" data-format="Y-m-d" required>
+                <input class="picker day required" name="thisDay" data-cal="false" data-time="false" data-format="Y-m-d" required>
             </div>
-            <div class="cal_container">
-                <p>開始時間</p>
-                <input class="picker prev" name="startTime" data-cal="true" data-time="true" data-format="H:i" required>
-            </div>
-            <div class="cal_container">
-                <p>終了時間</p>
-                <input class="picker next" name="endTime" data-cal="true" data-time="true" data-format="H:i" required>
+            <div class="cal_container calendar_times">
+                <div class="cal_times">
+                    <p>開始時間</p>
+                    <input class="picker prevTime required times" name="startTime" data-cal="true" data-time="true" data-format="H:i" required value="00:00">
+                </div>
+                <div class="cal_times">
+                    <p>終了時間</p>
+                    <input class="picker nextTime required times" name="endTime" data-cal="true" data-time="true" data-format="H:i" required value="00:00">
+                </div>
             </div>
         </div>
-        <input type="submit" value="submit" class="submitter" disabled="true">
+        <input type="submit" value="submit" class="submitter w-100">
     </form>
 {% endblock maincontent %}
 
 {% block js %}
     <script type="text/javascript">
         const toBool = (str) => str.toLowerCase() === "true"
-        function times(){
+        function init(){
             document.querySelectorAll(".picker").forEach(function(el){
                 flatpickr(el,{
                     locale: "ja",
@@ -63,18 +69,35 @@
                     dateFormat: el.dataset.format,
                     inline: true,
                     time_24hr: true,
-                    onChange: function(e){
-                        const submitBtn = document.querySelector(".submitter")
-                        const prev = document.querySelector(".prev").value
-                        const next = document.querySelector(".next").value
-                        if(next > prev && prev && next)
-                            submitBtn.disabled = false;
-                        else if(!submitBtn.disabled)
-                            submitBtn.disabled = true
-                    }
+                    defaultHour: 0
                 });
-            })
+            });
+            document.querySelectorAll(".forms input[type=radio]").forEach(function(e){
+                e.addEventListener("click",function(el){
+                    if(el.srcElement.dataset.label == "times"){
+                        document.querySelector(".calendar_times").style.display = "inline-block"
+                        document.querySelectorAll(".times").forEach(function(e){
+                            e.classList.add("required")
+                        })
+                    }else if(el.srcElement.dataset.label == "allday"){
+                        document.querySelector(".calendar_times").style.display = "none"
+                        document.querySelectorAll(".times").forEach(function(e){
+                            e.classList.remove("required")
+                        })
+                    }
+               });
+            });
         }
-        times()
+        window.onload = init
+        function test(){
+            let require_flag = false;
+            document.querySelectorAll(".required").forEach(function(e){
+                if(!e.value)
+                    require_flag = true
+            });
+            if(require_flag)
+                return false
+        }
+        
     </script>
 {% endblock js %}
