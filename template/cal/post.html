@@ -1,12 +1,54 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.css" integrity="sha512-OtwMKauYE8gmoXusoKzA/wzQoh7WThXJcJVkA29fHP58hBF7osfY0WLCIZbwkeL9OgRCxtAfy17Pn3mndQ4PZQ==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/themes/material_green.css" integrity="sha512-bKUTJxR2+ofaTTNdnVdBDp4Hw0DkyFOH6HczeoYBj2pt7OCo+9mb1rFI6+i92YQO/NWRGQsItwETMZ/I2rcrIw==" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.js" integrity="sha512-+ruHlyki4CepPr07VklkX/KM5NXdD16K1xVwSva5VqOVbsotyCQVKEwdQ1tAeo3UkHCXfSMtKU/mZpKjYqkxZA==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/l10n/ja.min.js" integrity="sha512-XamS5TTeqwEqePo/YxW3AFGwvEcQzN520Om7b1eB/LYHt6tLgXZeutZPPF8D0sIo7YndJEpCEhKwvf62U780Dw==" crossorigin="anonymous"></script>
+<style type="text/css">
+    .calendars{
+        text-align:center;
+    }
+    .cal_container{
+        display: inline-block;
+        text-align: center;
+    }
+</style>
+{% endblock css %}
+
 {% block maincontent %}
     <h1>{{ context.foo }}</h1>
     <form method="POST" action="{% url 'saves' %}">{% csrf_token %}
         <input type="text" name="title" placeholder="Title">
-        <input type="text" name="startDay_0" placeholder="yyyy-mm--dd">
-        <input type="text" name="startDay_1" placeholder="hh:mm:ss">
+        <div class="calendars">
+            <div class="cal_container">
+                <input class="picker prev">
+            </div>
+            <div class="cal_container">
+                <input class="picker next">
+            </div>
+        </div>
         <input type="submit" value="submit">
     </form>
 {% endblock maincontent %}
+
+{% block js %}
+    <script type="text/javascript">
+        flatpickr(".picker",{
+            locale: "ja",
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            inline: true,
+            time_24hr: true,
+            onChange: function(e){
+                const submitBtn = document.querySelector(".submitter")
+                const prev = document.querySelector(".prev").value
+                const next = document.querySelector(".next").value
+                if(next > prev && prev && next)
+                    submitBtn.disabled = false;
+                else if(!submitBtn.disabled)
+                    submitBtn.disabled = true
+  }
+    </script>
+{% endblock js %}
